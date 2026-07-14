@@ -1,9 +1,9 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pre-Flight — the fueling checklist for long sessions</title>
-<meta name="description" content="A free GO/NO-GO fueling checklist for marathon and triathlon training. Carbs, salt, gear, alarms — run it before every long session.">
-<meta property="og:title" content="Pre-Flight — the fueling checklist for long sessions">
+<title>Pre-Flight, the fueling checklist for long sessions</title>
+<meta name="description" content="A free GO/NO-GO fueling checklist for marathon and triathlon training. Carbs, salt, gear, alarms. Run it before every long session.">
+<meta property="og:title" content="Pre-Flight, the fueling checklist for long sessions">
 <meta property="og:description" content="Pilots don't take off on vibes. Don't start a 4-hour ride on them either. Free checklist, works offline on your phone.">
 <meta property="og:image" content="https://tonymach.github.io/preflight/app/icon-512.png">
 <meta name="theme-color" content="#05080B">
@@ -114,7 +114,7 @@
 <main>
   <div class="eyebrow"><b>FUEL BLOCK</b> · PRE-FLIGHT</div>
   <h1>The training is the fun part.<br>Fueling is the checklist.</h1>
-  <p class="sub">I'm training for my first Ironman and the hardest part isn't the hours — it's remembering the gels, the salt, the alarm, the second bottle, <b>every single session</b>.</p>
+  <p class="sub">I'm training for my first Ironman and the hardest part isn't the hours. It's remembering the gels, the salt, the alarm, the second bottle, <b>every single session</b>.</p>
   <p class="sub">Pilots solved this decades ago: they don't take off on vibes, they run a checklist. <b>Pre-Flight</b> is that, for long training days. Pick the session, it tells you what to pack (including the gel math), tick every line, and the lamp says <b style="color:var(--go)">GO</b>.</p>
 
   <div class="card" id="card">
@@ -125,7 +125,7 @@
     <div class="body">
       <div class="check" data-i="0" tabindex="0" role="checkbox" aria-checked="false">
         <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></div>
-        <div class="txt">Training for something long <span class="hint">· marathon, 70.3, full — counts</span></div>
+        <div class="txt">Training for something long <span class="hint">· marathon, 70.3, full, all count</span></div>
       </div>
       <div class="check" data-i="1" tabindex="0" role="checkbox" aria-checked="false">
         <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></div>
@@ -147,13 +147,13 @@
   <p class="tiny">free forever · no spam · one email when it ships to you</p>
 
   <div class="grp">What you get</div>
-  <div class="feat"><div class="k">ADAPTS</div><p>Swim, bike, run or brick — <b>the list changes with the session</b>. No wetsuit line on a run day.</p></div>
+  <div class="feat"><div class="k">ADAPTS</div><p>Swim, bike, run or brick: <b>the list changes with the session</b>. No wetsuit line on a run day.</p></div>
   <div class="feat"><div class="k">GEL MATH</div><p>Set the duration and it computes fuel: <b>2h ride → 6 gels · 150g carbs</b>. Counted, not guessed.</p></div>
-  <div class="feat"><div class="k">GO / NO-GO</div><p>Everything ticked, the lamp goes green. Something missing — <b>you find out in the kitchen, not at kilometre 60</b>.</p></div>
+  <div class="feat"><div class="k">GO / NO-GO</div><p>Everything ticked, the lamp goes green. Something missing? <b>you find out in the kitchen, not at kilometre 60</b>.</p></div>
   <div class="feat"><div class="k">FREE APP</div><p>It's a web app: <b>works offline, no app store, no account</b>. Open it on your phone, Share → Add to Home Screen, done.</p></div>
 
   <a class="try" href="app/">✈ TRY THE CHECKLIST NOW →</a>
-  <p class="tiny">no signup needed to use it — the list is for updates</p>
+  <p class="tiny">no signup needed to use it · the list is for updates</p>
 
   <footer>PRE-FLIGHT · FUEL BLOCK · built mid-Ironman-build by a guy who bonked</footer>
 </main>
@@ -199,15 +199,15 @@
         state.fill(true);
         document.querySelectorAll(".check").forEach(el=>{el.classList.add("done");el.setAttribute("aria-checked","true");});
         paint();
-        msg.className="msg ok";msg.textContent="✈ CLEARED — YOU'RE ON THE LIST";
+        msg.className="msg ok";msg.textContent="✈ CLEARED · YOU'RE ON THE LIST";
         document.getElementById("form").style.opacity=".55";
         btn.textContent="SENT";
       }else{
-        msg.className="msg err";msg.textContent="NO-GO — check the email and retry";
+        msg.className="msg err";msg.textContent="NO-GO · check the email and retry";
         btn.disabled=false;btn.textContent="SEND IT";
       }
     }catch(err){
-      msg.className="msg err";msg.textContent="NO-GO — network error, retry";
+      msg.className="msg err";msg.textContent="NO-GO · network error, retry";
       btn.disabled=false;btn.textContent="SEND IT";
     }
   });
