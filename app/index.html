@@ -1,12 +1,19 @@
 <!doctype html>
 <!--
-  PRE-FLIGHT — stupid-simple pre-training GO/NO-GO checklist
-  One screen. Pick session + duration → list adapts → tap to tick → GO.
-  Persists across sessions. Part of the FUEL BLOCK family.
+  HAPPY TUMTUM — stupid-simple pre-training GO/NO-GO checklist
+  Pick session + duration → list adapts → tap to tick → GO.
+  First run asks your gel size + carbs/hr (saved locally). Swipe a line left to delete it.
 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Happy Tumtum</title>
+<title>Happy Tumtum App, GO/NO-GO fueling checklist</title>
+<meta name="description" content="Free offline fueling checklist for swim, bike, run and brick sessions. Pick the session, it does the gel and salt math, tick every line, GO.">
+<link rel="canonical" href="https://tonymach.github.io/happy-tumtum/app/">
+<meta property="og:title" content="Happy Tumtum App">
+<meta property="og:description" content="Free offline GO/NO-GO fueling checklist for endurance training.">
+<meta property="og:url" content="https://tonymach.github.io/happy-tumtum/app/">
+<meta property="og:image" content="https://tonymach.github.io/happy-tumtum/app/icon-512.png">
+<meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#F6F4EE">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -16,17 +23,17 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
   :root{
     --panel:#F6F4EE; --raised:#FFFFFF; --raised2:#EDEBE0; --line:#DFDBCF;
     --ink:#223028; --dim:#5F6E63; --dimmer:#98A398;
-    --amber:#2E4A3C; --amber-bg:#E4EBE2; --amber-line:#C6D2C4;
-    --cyan:#3E6650;
+    --pine:#2E4A3C; --pine-soft:#3E6650;
     --go:#2F9E63; --go-bg:#DFF0E5;
     --nogo:#B4553B; --nogo-bg:#F5E6DF;
     --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    --serif:'Fraunces',Georgia,serif;
     --sans:'Inter',system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -34,98 +41,143 @@
   body{display:flex;justify-content:center}
   #app{width:100%;max-width:468px;min-height:100vh;background:var(--panel);
     display:flex;flex-direction:column;position:relative;
-    box-shadow:0 0 0 1px var(--line),0 24px 60px rgba(34,48,40,.12)}
+    box-shadow:0 0 0 1px var(--line),0 18px 44px rgba(34,48,40,.10)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 
   header{padding:16px 18px 14px;border-bottom:1px solid var(--line)}
-  .htop{display:flex;align-items:center;justify-content:space-between}
-  .htop h1{margin:0;font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:2.5px}
-  .htop .fam{font-family:var(--mono);font-size:9.5px;color:var(--dimmer);letter-spacing:2px;margin-top:2px}
+  .htop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .htop h1{margin:0;font-family:var(--serif);font-weight:500;font-optical-sizing:auto;
+    font-size:24px;letter-spacing:-.01em;line-height:1.04}
+  .hbtns{display:flex;align-items:center;gap:8px}
   /* GO / NO-GO lamp */
-  .status{display:flex;align-items:center;gap:9px;padding:7px 13px 7px 10px;border-radius:24px;
-    border:1px solid var(--nogo-bg);background:var(--nogo-bg);transition:.25s}
+  .status{display:flex;align-items:center;gap:9px;padding:8px 14px 8px 11px;border-radius:14px;
+    border:1.5px solid var(--nogo);background:var(--nogo-bg);transition:.25s}
   .status .dot{width:11px;height:11px;border-radius:50%;background:var(--nogo);
     box-shadow:0 0 6px var(--nogo);transition:.25s}
-  .status .lab{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:1.5px;color:var(--nogo);transition:.25s}
-  .status .ct{font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-left:2px}
-  #app.go .status{border-color:var(--go-bg);background:var(--go-bg)}
+  .status .lab{font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:1.5px;color:var(--nogo);transition:.25s}
+  #app.go .status{border-color:var(--go);background:var(--go-bg)}
   #app.go .status .dot{background:var(--go);box-shadow:0 0 8px var(--go)}
   #app.go .status .lab{color:var(--go)}
+  .gear{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--raised);
+    font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
   main{flex:1;overflow-y:auto;padding:16px 16px 120px}
 
-  /* session picker */
-  .picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
-  .seg{padding:13px 4px;border-radius:12px;border:1px solid var(--line);background:var(--raised);
-    color:var(--dim);font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:1px;
+  /* session + duration pickers */
+  .picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+  .seg{padding:13px 4px;border-radius:14px;border:1px solid var(--line);background:var(--raised);
+    color:var(--dim);font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:1px;
     cursor:pointer;transition:.12s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
-  .seg .ic{font-size:17px;line-height:1}
+  .seg .ic{font-size:18px;line-height:1}
   .seg:active{transform:scale(.96)}
-  .seg.on{background:linear-gradient(160deg,#3E6650,var(--amber));border-color:var(--amber);color:#F6F4EE;
-    box-shadow:0 0 0 1px var(--amber),0 4px 14px rgba(46,74,60,.22)}
-
-  /* duration stepper */
-  .dur{display:flex;align-items:center;justify-content:space-between;background:var(--raised);
-    border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 16px;margin-bottom:16px}
-  .dur.hide{display:none}
-  .dur .lbl{font-size:12px;color:var(--dim)}
-  .dur .lbl small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--amber);margin-top:2px}
-  .dur .ctrl{display:flex;align-items:center;gap:12px}
-  .dur .val{font-family:var(--mono);font-size:22px;font-weight:700;min-width:54px;text-align:center}
-  .rnd{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--raised2);
-    color:var(--ink);font-size:22px;font-family:var(--mono);cursor:pointer;display:flex;align-items:center;justify-content:center}
-  .rnd:active{background:var(--amber);color:#fff;border-color:var(--amber)}
+  .seg.on{background:var(--pine);border-color:var(--pine);color:#F6F4EE;
+    box-shadow:0 4px 14px rgba(30,58,47,.18)}
+  #dur{margin-bottom:16px}
+  #dur.hide{display:none}
+  #dur .seg{padding:11px 4px}
 
   /* group label */
-  .grp{font-family:var(--mono);font-size:10px;letter-spacing:2.5px;color:var(--dimmer);
+  .grp{font-family:var(--mono);font-size:11.5px;letter-spacing:3px;color:var(--dimmer);
     text-transform:uppercase;margin:18px 2px 10px;display:flex;align-items:center;gap:8px}
-  .grp:first-child{margin-top:2px}
+  .col:first-child>.grp{margin-top:2px}
   .grp::after{content:"";flex:1;height:1px;background:var(--line)}
 
-  /* check row */
-  .check{display:flex;align-items:center;gap:14px;background:var(--raised);border:1px solid var(--line);
-    border-radius:12px;padding:15px 16px;margin-bottom:9px;cursor:pointer;transition:.12s;user-select:none}
-  .check:active{transform:scale(.99)}
-  .check .box{width:28px;height:28px;border-radius:8px;border:2px solid var(--dimmer);flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;transition:.12s}
-  .check .box svg{width:16px;height:16px;opacity:0;transform:scale(.5);transition:.15s;stroke:#fff}
-  .check .txt{font-size:15px;line-height:1.3}
-  .check .txt .hint{font-family:var(--mono);font-size:11px;color:var(--dimmer)}
-  .check.done{border-color:var(--go-bg);background:linear-gradient(0deg,var(--go-bg),var(--raised))}
+  /* check row + swipe-to-delete */
+  .row{position:relative;border-radius:14px;overflow:hidden;margin-bottom:9px}
+  .del{position:absolute;inset:0 0 0 auto;width:84px;background:var(--nogo);color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:1px}
+  .check{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:var(--raised);
+    border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;
+    transition:transform .18s,background .12s,border-color .12s;user-select:none;touch-action:pan-y}
+  .check:active{transform:scale(.995)}
+  .check .box{width:30px;height:30px;border-radius:9px;border:2px solid var(--dimmer);flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;transition:.12s;background:var(--raised)}
+  .check .box svg{width:17px;height:17px;opacity:0;transform:scale(.5);transition:.15s;stroke:#fff}
+  .check .txt{font-size:17px;line-height:1.3}
+  .check .txt .hint{font-family:var(--mono);font-size:12px;color:var(--dimmer)}
+  .check.done{border-color:var(--go-bg);background:var(--go-bg)}
   .check.done .box{background:var(--go);border-color:var(--go)}
   .check.done .box svg{opacity:1;transform:scale(1)}
   .check.done .txt{color:var(--dim)}
-  .check.done .txt .hint{color:var(--dimmer)}
 
   /* pack: the shopping-list moment */
   .pack{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:12px;
-    padding:14px 15px;margin-top:16px}
-  .pack .pl{font-family:var(--mono);font-size:12.5px;color:var(--ink);letter-spacing:.5px;line-height:1.5}
-  .pack .pl b{color:var(--amber);letter-spacing:2px;font-size:10px;display:block;margin-bottom:3px}
-  .pack a{flex:0 0 auto;font-family:var(--mono);font-weight:700;font-size:11.5px;letter-spacing:1px;
-    color:#F6F4EE;background:var(--amber);text-decoration:none;border-radius:9px;padding:12px 13px}
+    background:var(--raised);border:1.5px solid var(--pine);border-radius:14px;
+    padding:15px 16px;margin-top:16px}
+  .pack .pl{font-family:var(--mono);font-size:14px;color:var(--ink);letter-spacing:.5px;line-height:1.5}
+  .pack .pl b{color:var(--pine);letter-spacing:2px;font-size:11px;display:block;margin-bottom:3px}
+  .pack a{flex:0 0 auto;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:1px;
+    color:#F6F4EE;background:var(--pine);text-decoration:none;border-radius:10px;padding:13px 14px}
 
   /* bottom bar */
   .foot{position:fixed;bottom:0;left:0;right:0;max-width:468px;margin:0 auto;
     padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(0deg,var(--panel) 70%,transparent);
     display:flex;gap:10px}
   .cleared{flex:1;border-radius:14px;border:1px solid var(--go);background:var(--go-bg);color:var(--go);
-    font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:2px;text-align:center;
+    font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:2px;text-align:center;
     padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;opacity:.4;transition:.25s}
   #app.go .cleared{opacity:1;background:var(--go);color:#fff;box-shadow:0 0 24px rgba(47,158,99,.3)}
-  .cleared .big{font-size:16px}
   .reset{flex:0 0 auto;width:56px;border-radius:14px;border:1px solid var(--line);background:var(--raised);
     color:var(--nogo);font-family:var(--mono);font-size:18px;cursor:pointer}
   .reset:active{background:var(--nogo-bg)}
 
+  /* setup sheet */
+  .setup{position:fixed;inset:0;z-index:20;background:rgba(34,48,40,.4);
+    display:flex;align-items:flex-end;justify-content:center}
+  .setup.hide,.hide{display:none!important}
+  .sc{background:var(--panel);border-radius:20px 20px 0 0;max-width:468px;width:100%;
+    padding:24px 20px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto}
+  .sc h2{font-family:var(--serif);font-weight:500;font-optical-sizing:auto;font-size:28px;margin:0 0 4px}
+  .sc .sub{font-size:15px;color:var(--dim);margin:0 0 20px}
+  .q{font-family:var(--mono);font-size:11.5px;letter-spacing:2.5px;color:var(--dimmer);
+    text-transform:uppercase;margin:18px 0 8px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:var(--raised);
+    color:var(--ink);font-family:var(--mono);font-size:15px;font-weight:600;cursor:pointer;transition:.12s}
+  .chip.on{background:var(--pine);border-color:var(--pine);color:#F6F4EE}
+  .chipin{width:86px;padding:13px 12px;border-radius:12px;border:1px solid var(--line);
+    background:var(--raised);font-family:var(--mono);font-size:15px;color:var(--ink);outline:none}
+  .chipin:focus{border-color:var(--pine)}
+  .calc{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:14px;color:var(--dim)}
+  .shint{font-size:14px;color:var(--dim);margin:20px 0 0;line-height:1.5}
+  .shint b{color:var(--ink)}
+  .save{width:100%;margin-top:20px;border:none;border-radius:14px;padding:17px;cursor:pointer;
+    font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:1.5px;
+    background:var(--pine);color:#F6F4EE}
+  .ghost{width:100%;margin-top:12px;border:1px solid var(--line);border-radius:14px;padding:13px;
+    cursor:pointer;background:var(--raised);color:var(--nogo);
+    font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:1px}
+
+  /* ── desktop: left rail + 3-column checklist, one screen, no page scroll ── */
+  @media (min-width:900px){
+    #app{max-width:1200px;height:100vh;min-height:0;overflow:hidden;
+      display:grid;grid-template-columns:340px 1fr;grid-template-rows:auto auto auto 1fr auto}
+    header{grid-area:1/1;border-bottom:0;padding:22px 22px 18px}
+    .htop{flex-direction:column;align-items:flex-start;gap:14px}
+    main{display:contents}
+    .picker{grid-area:2/1;margin:0 22px 14px;grid-template-columns:repeat(2,1fr)}
+    #dur{grid-area:3/1;margin:0 22px;grid-template-columns:repeat(4,1fr)}
+    .foot{grid-area:5/1;position:static;max-width:none;background:none;padding:14px 22px 20px}
+    #list{grid-area:1/2/-1/3;overflow-y:auto;border-left:1px solid var(--line);
+      padding:22px 24px;display:grid;grid-template-columns:repeat(3,1fr);
+      gap:0 18px;align-content:start}
+    #list .grp{margin-top:2px}
+    .pack{grid-column:1/-1}
+    .sc{border-radius:20px;align-self:center;margin:auto}
+    .setup{align-items:center}
+  }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div id="app">
   <header>
     <div class="htop">
-      <div><h1>HAPPY TUMTUM</h1><div class="fam">TUMTUM READINESS CHECK</div></div>
-      <div class="status" id="status"><span class="dot"></span><span class="lab" id="statLab">NO-GO</span><span class="ct" id="statCt">0/0</span></div>
+      <h1>Happy Tumtum <span class="sr">· the fueling checklist</span></h1>
+      <div class="hbtns">
+        <div class="status" id="status"><span class="dot"></span><span class="lab" id="statLab">NO-GO</span></div>
+        <button class="gear" id="gear" title="Your fuel settings">⚙</button>
+      </div>
     </div>
   </header>
 
@@ -137,21 +189,48 @@
       <div class="seg" data-sess="brick"><span class="ic">⚡</span>BRICK</div>
     </div>
 
-    <div class="dur" id="dur">
-      <div class="lbl">Session length<small id="fuelHint">—</small></div>
-      <div class="ctrl">
-        <button class="rnd" data-dstep="-0.5">−</button>
-        <div class="val"><span id="durVal">2</span><span style="font-size:13px;color:var(--dim)">h</span></div>
-        <button class="rnd" data-dstep="0.5">+</button>
-      </div>
+    <div class="picker" id="dur">
+      <div class="seg" data-dur="1">1h</div>
+      <div class="seg" data-dur="2">2h</div>
+      <div class="seg" data-dur="3">3h</div>
+      <div class="seg" data-dur="5">5h</div>
     </div>
 
     <div id="list"></div>
   </main>
 
   <div class="foot">
-    <div class="cleared" id="cleared"><span id="clearedTxt">COMPLETE THE CHECKS</span></div>
+    <div class="cleared" id="cleared"><span id="clearedTxt">RUN THE CHECKS</span></div>
     <button class="reset" id="reset" title="Reset for next session">↺</button>
+  </div>
+
+  <div class="setup hide" id="setup">
+    <div class="sc">
+      <h2>Your fuel</h2>
+      <p class="sub">Two answers, saved on your phone. The math follows you.</p>
+      <div class="q">Carbs per gel</div>
+      <div class="chips" id="gelChips">
+        <div class="chip" data-gel="20">20g</div>
+        <div class="chip" data-gel="25">25g</div>
+        <div class="chip" data-gel="30">30g</div>
+        <div class="chip" data-gel="40">40g</div>
+        <input class="chipin" id="gelCustom" type="number" min="10" max="120" placeholder="…g" aria-label="Custom carbs per gel">
+      </div>
+      <div class="q">Carbs per hour</div>
+      <div class="chips" id="chChips">
+        <div class="chip" data-ch="60">60</div>
+        <div class="chip" data-ch="75">75</div>
+        <div class="chip" data-ch="90">90</div>
+        <input class="chipin" id="chCustom" type="number" min="20" max="150" placeholder="…g/h" aria-label="Custom carbs per hour">
+      </div>
+      <div class="calc">or from weight:
+        <input class="chipin" id="wkg" type="number" min="30" max="150" placeholder="kg" aria-label="Body weight in kg">
+        <button class="chip hide" id="useCalc"></button>
+      </div>
+      <p class="shint"><b>Swipe any checklist line left to delete it</b> if you don't carry the thing. ⚙ up top reopens this.</p>
+      <button class="ghost hide" id="restore">RESTORE DELETED LINES</button>
+      <button class="save" id="saveSetup">SAVE · LET'S GO</button>
+    </div>
   </div>
 </div>
 
@@ -159,8 +238,9 @@
 (function(){
   "use strict";
   const $=s=>document.querySelector(s);
-  const CARB_HR=75, GEL_G=25;            // his numbers
-  const gels=h=>Math.max(1,Math.ceil((CARB_HR*h)/GEL_G));
+  const DEF={gelG:25,carbHr:75};
+  const P=()=>S.prefs||DEF;
+  const gels=h=>Math.max(1,Math.ceil((P().carbHr*h)/P().gelG));
 
   // ponytail: placeholder store link + utm; swap for The Feed CJ deep link once approved
   const AFF="https://thefeed.com/?utm_source=happytumtum&utm_medium=app&utm_campaign=pack";
@@ -170,11 +250,11 @@
   const track=ev=>{if(sent[ev])return;sent[ev]=1;
     try{fetch(API+"/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ev,cid})}).catch(()=>{});}catch(e){}};
 
-  // ── per-session checklists ──  {id,label,hint}  hint may be a fn(dur)
-  const gelLine=()=>({id:"gels",label:"Gels packed",grp:"fuel",hint:d=>gels(d)+" gel"+(gels(d)>1?"s":"")+" for the session"});
+  // ── per-session checklists ──
+  const gelLine=()=>({id:"gels",label:"Gels packed",grp:"fuel",hint:d=>"×"+gels(d)});
   const TPL={
     swim:{fuel:[
-        {id:"ate",label:"Ate ~1 hr before",hint:"bank it, no fuel mid-swim"},
+        {id:"ate",label:"Ate ~1 hr before"},
       ],gear:[
         {id:"goggles",label:"Goggles + cap"},
         {id:"suit",label:"Suit / wetsuit"},
@@ -186,7 +266,7 @@
     bike:{fuel:[
         {id:"bottles",label:"Bottles filled",hint:"fluid + salt"},
         gelLine(),
-        {id:"pre",label:"Pre-ride gel eaten",hint:"T-15 min"},
+        {id:"pre",label:"Pre-ride gel eaten"},
       ],gear:[
         {id:"fix",label:"Tube ×2 + inflation + multitool"},
         {id:"helmet",label:"Helmet · shoes · glasses"},
@@ -197,14 +277,14 @@
       ]},
     run:{fuel:[
         gelLine(),
-        {id:"bottle",label:"Handheld / bottle",hint:"if > 75 min"},
+        {id:"bottle",label:"Handheld / bottle"},
         {id:"pre",label:"Ate before"},
       ],gear:[
         {id:"shoes",label:"Shoes + socks"},
         {id:"chafe",label:"Hat + anti-chafe"},
       ],tech:[
         {id:"watch",label:"Watch charged"},
-        {id:"beep",label:"Fuel alarm set",hint:"if long"},
+        {id:"beep",label:"Fuel alarm set"},
         {id:"route",label:"Route + water known"},
       ]},
     brick:{fuel:[
@@ -222,43 +302,41 @@
         {id:"route",label:"Route + refill stops"},
       ]},
   };
-  const GRP_LABEL={fuel:"Fuel",gear:"Gear",tech:"Tech · route"};
+  const GRP_LABEL={fuel:"Fuel",gear:"Gear",tech:"Tech"};
   const NEEDS_DUR=s=>s!=="swim";
 
   // ── state ──
-  let S={sess:"bike",dur:2,checks:{}};   // checks: {sess:{id:true}}
+  let S={sess:"bike",dur:2,checks:{},prefs:null,removed:{}};
   const store={
-    async get(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}},
-    async set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    get(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}},
+    set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
   };
   let t;const save=()=>{clearTimeout(t);t=setTimeout(()=>store.set("preflight",S),200);};
 
-  function items(){ // flat list of {id,label,grp,hint} for current session
-    const tpl=TPL[S.sess],out=[];
+  function items(){
+    const tpl=TPL[S.sess],gone=S.removed[S.sess]||[],out=[];
     ["fuel","gear","tech"].forEach(g=>(tpl[g]||[]).forEach(it=>{
+      if(gone.includes(it.id))return;
       out.push({...it,grp:g,hint:typeof it.hint==="function"?it.hint(S.dur):it.hint});
     }));
     return out;
   }
 
   function render(){
-    // picker
-    document.querySelectorAll(".seg").forEach(b=>b.classList.toggle("on",b.dataset.sess===S.sess));
-    // duration
+    document.querySelectorAll("#picker .seg").forEach(b=>b.classList.toggle("on",b.dataset.sess===S.sess));
     $("#dur").classList.toggle("hide",!NEEDS_DUR(S.sess));
-    $("#durVal").textContent=S.dur;
-    $("#fuelHint").textContent=NEEDS_DUR(S.sess)?("carry "+gels(S.dur)+" gels · "+(CARB_HR*S.dur)+"g carbs"):"—";
-    // list
+    document.querySelectorAll("#dur .seg").forEach(b=>b.classList.toggle("on",+b.dataset.dur===S.dur));
     const its=items(),c=S.checks[S.sess]||{};
     let html="",lastG=null;
     its.forEach(it=>{
-      if(it.grp!==lastG){html+=`<div class="grp">${GRP_LABEL[it.grp]}</div>`;lastG=it.grp;}
+      if(it.grp!==lastG){if(lastG)html+=`</div>`;html+=`<div class="col"><div class="grp">${GRP_LABEL[it.grp]}</div>`;lastG=it.grp;}
       const done=!!c[it.id];
-      html+=`<div class="check ${done?"done":""}" data-id="${it.id}">
+      html+=`<div class="row"><div class="del" data-del="${it.id}">DELETE</div>
+        <div class="check ${done?"done":""}" data-id="${it.id}">
         <div class="box"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></div>
-        <div class="txt">${it.label}${it.hint?` <span class="hint">· ${it.hint}</span>`:""}</div></div>`;
+        <div class="txt">${it.label}${it.hint?` <span class="hint">· ${it.hint}</span>`:""}</div></div></div>`;
     });
-    // pack: the shopping-list / money moment (E metric)
+    if(lastG)html+=`</div>`;
     if(NEEDS_DUR(S.sess)){
       const btl=S.sess==="run"?"1 bottle":"2 bottles";
       html+=`<div class="pack"><div class="pl"><b>PACK</b>${gels(S.dur)} gels · ${btl} · salt tabs</div>
@@ -266,31 +344,99 @@
       track("pack_view");
     }
     $("#list").innerHTML=html;
-    // status
     const total=its.length, hit=its.filter(it=>c[it.id]).length, go=hit===total&&total>0;
-    $("#statCt").textContent=hit+"/"+total;
     $("#statLab").textContent=go?"GO":"NO-GO";
     $("#app").classList.toggle("go",go);
-    $("#clearedTxt").innerHTML=go?`<span class="big">✈ CLEARED · SEND IT</span>`:`${total-hit} left before GO`;
+    $("#clearedTxt").textContent=go?"✈ GO":`${total-hit} LEFT`;
   }
 
+  // ── setup sheet ──
+  let T={};
+  const suggest=w=>Math.min(95,Math.max(50,Math.round(w))); // ponytail: ~1g/kg/h clamped; the real ceiling is gut training
+  function paintSetup(){
+    document.querySelectorAll("[data-gel]").forEach(c=>c.classList.toggle("on",+c.dataset.gel===T.gelG));
+    document.querySelectorAll("[data-ch]").forEach(c=>c.classList.toggle("on",+c.dataset.ch===T.carbHr));
+    $("#gelCustom").value=[20,25,30,40].includes(T.gelG)?"":T.gelG;
+    $("#chCustom").value=[60,75,90].includes(T.carbHr)?"":T.carbHr;
+    $("#restore").classList.toggle("hide",!Object.values(S.removed).some(a=>a.length));
+  }
+  function openSetup(){
+    T={...P(),wKg:S.prefs?.wKg||null};
+    if(T.wKg)$("#wkg").value=T.wKg;
+    paintSetup();
+    $("#setup").classList.remove("hide");
+  }
+  $("#wkg").addEventListener("input",()=>{
+    const w=+$("#wkg").value;
+    const b=$("#useCalc");
+    if(w>=30&&w<=150){b.textContent="use "+suggest(w)+"g/h";b.classList.remove("hide");}
+    else b.classList.add("hide");
+  });
+  $("#gelCustom").addEventListener("input",e=>{const v=+e.target.value;if(v>=10)T.gelG=v;paintSetup();$("#gelCustom").value=e.target.value;});
+  $("#chCustom").addEventListener("input",e=>{const v=+e.target.value;if(v>=20)T.carbHr=v;paintSetup();$("#chCustom").value=e.target.value;});
+
   document.body.addEventListener("click",e=>{
+    const del=e.target.closest("[data-del]");
+    if(del){(S.removed[S.sess]=S.removed[S.sess]||[]).push(del.dataset.del);render();save();return;}
     if(e.target.closest("#buyPack")){sent.pack_tap=0;track("pack_tap");return;}
+    if(e.target.closest("#gear")){openSetup();return;}
+    const gc=e.target.closest("[data-gel]");
+    if(gc){T.gelG=+gc.dataset.gel;paintSetup();return;}
+    const cc=e.target.closest("[data-ch]");
+    if(cc){T.carbHr=+cc.dataset.ch;paintSetup();return;}
+    if(e.target.closest("#useCalc")){const w=+$("#wkg").value;T.carbHr=suggest(w);T.wKg=w;paintSetup();return;}
+    if(e.target.closest("#restore")){S.removed={};paintSetup();render();save();return;}
+    if(e.target.closest("#saveSetup")){
+      S.prefs={gelG:T.gelG||DEF.gelG,carbHr:T.carbHr||DEF.carbHr,wKg:T.wKg||null};
+      $("#setup").classList.add("hide");render();save();return;
+    }
     const seg=e.target.closest("[data-sess]");
     if(seg){S.sess=seg.dataset.sess;render();save();return;}
-    const step=e.target.closest("[data-dstep]");
-    if(step){S.dur=Math.min(8,Math.max(0.5,+(S.dur+ +step.dataset.dstep).toFixed(1)));render();save();return;}
+    const d=e.target.closest("[data-dur]");
+    if(d){S.dur=+d.dataset.dur;render();save();return;}
     const row=e.target.closest("[data-id]");
-    if(row){const c=S.checks[S.sess]||(S.checks[S.sess]={});c[row.dataset.id]=!c[row.dataset.id];render();save();return;}
+    if(row){
+      if(row.dataset.swiped)return;
+      if(row.dataset.open){row.style.transform="";delete row.dataset.open;return;}
+      const c=S.checks[S.sess]||(S.checks[S.sess]={});c[row.dataset.id]=!c[row.dataset.id];render();save();return;
+    }
     if(e.target.closest("#reset")){S.checks[S.sess]={};render();save();return;}
   });
 
-  (async()=>{
-    const saved=await store.get("preflight");
-    if(saved) S={...S,...saved,checks:saved.checks||{}};
-    render();
-  })();
+  // ── swipe left to delete ──
+  let swEl=null,sx=0,sy=0,dx=0,moved=false;
+  const list=$("#list");
+  list.addEventListener("pointerdown",e=>{
+    const c=e.target.closest(".check");
+    if(!c)return;
+    swEl=c;sx=e.clientX;sy=e.clientY;dx=0;moved=false;
+    c.style.transition="none";
+  });
+  list.addEventListener("pointermove",e=>{
+    if(!swEl)return;
+    dx=e.clientX-sx;
+    if(Math.abs(dx)<8||Math.abs(e.clientY-sy)>Math.abs(dx))return;
+    moved=true;
+    swEl.style.transform=`translateX(${Math.min(0,Math.max(-84,dx))}px)`;
+  });
+  const endSwipe=()=>{
+    if(!swEl)return;
+    const el=swEl;swEl=null;
+    el.style.transition="";
+    if(moved&&dx<-60){el.style.transform="translateX(-84px)";el.dataset.open="1";}
+    else if(!el.dataset.open||moved){el.style.transform="";delete el.dataset.open;}
+    if(moved){el.dataset.swiped="1";setTimeout(()=>{delete el.dataset.swiped;},80);}
+  };
+  list.addEventListener("pointerup",endSwipe);
+  list.addEventListener("pointercancel",endSwipe);
 
-  if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+  // ── boot ──
+  const saved=store.get("preflight");
+  if(saved)S={...S,...saved,checks:saved.checks||{},removed:saved.removed||{},prefs:saved.prefs||null};
+  if(![1,2,3,5].includes(S.dur))S.dur=2;
+  render();
+  if(!S.prefs)openSetup();
+
+  if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js");
 })();
 </script>

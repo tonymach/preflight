@@ -1,11 +1,20 @@
 <!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Happy Tumtum, the fueling checklist for long sessions</title>
+<title>Happy Tumtum: fueling checklist + gel calculator for long sessions</title>
 <meta name="description" content="A free GO/NO-GO fueling checklist for marathon and triathlon training. Carbs, salt, gear, alarms. Run it before every long session.">
 <meta property="og:title" content="Happy Tumtum, the fueling checklist for long sessions">
 <meta property="og:description" content="Pilots don't take off on vibes. Don't start a 4-hour ride on them either. Free checklist, works offline on your phone.">
 <meta property="og:image" content="https://tonymach.github.io/happy-tumtum/app/icon-512.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="Happy Tumtum app icon">
+<meta property="og:url" content="https://tonymach.github.io/happy-tumtum/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://tonymach.github.io/happy-tumtum/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Happy Tumtum","url":"https://tonymach.github.io/happy-tumtum/app/","description":"Free GO/NO-GO fueling checklist for marathon and triathlon training","applicationCategory":"HealthApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Happy Tumtum free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Free forever, no app store, no account, works offline."}},{"@type":"Question","name":"How does the gel math work?","acceptedAnswer":{"@type":"Answer","text":"Set your carbs per hour and gel size once, pick the session duration, and it computes the gel count for the session."}}]}</script>
 <meta name="theme-color" content="#F6F4EE">
 <link rel="icon" type="image/png" href="app/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,43 +42,49 @@
   .hero .top{position:relative;z-index:2;padding:26px clamp(20px,5vw,56px)}
   .brand{font-family:var(--mono);font-size:11px;letter-spacing:3px;color:var(--pine)}
   .hero .words{position:relative;z-index:2;margin-top:auto;
-    padding:0 clamp(20px,5vw,56px) clamp(90px,16vh,170px);max-width:860px}
+    padding:0 clamp(20px,5vw,56px) clamp(70px,12vh,120px);max-width:860px}
   .hero .words::before{content:"";position:absolute;z-index:-1;inset:-70px -120px -60px -80px;
     background:radial-gradient(ellipse at 35% 55%,rgba(246,244,238,.96) 35%,rgba(246,244,238,.75) 60%,transparent 78%)}
-  h1{font-family:var(--serif);font-weight:340;font-optical-sizing:auto;font-size:clamp(38px,6.4vw,68px);
+  h1{font-family:var(--serif);font-weight:340;font-optical-sizing:auto;font-size:clamp(44px,7.2vw,84px);
     line-height:1.04;letter-spacing:-.02em;margin:0 0 18px;color:var(--ink)}
   h2{font-family:var(--serif);font-weight:500;font-optical-sizing:auto;
-    font-size:clamp(24px,4vw,32px);line-height:1.15;margin:6px 0 10px;color:var(--ink)}
+    font-size:clamp(28px,4.6vw,40px);line-height:1.15;margin:6px 0 10px;color:var(--ink)}
   h1 em{font-style:italic;color:var(--pine)}
-  .lede{font-size:clamp(16px,1.9vw,19px);color:var(--dim);max-width:34em;margin:0 0 28px}
+  .lede{font-size:clamp(18px,2.1vw,22px);color:var(--dim);max-width:32em;margin:0 0 30px}
   .lede b{color:var(--ink);font-weight:600}
 
-  /* signup: one box, one button */
-  form{display:flex;align-items:center;gap:12px;background:var(--card);border:1.5px solid var(--pine);
-    border-radius:14px;padding:8px 8px 8px 18px;max-width:480px;box-shadow:0 18px 44px rgba(34,48,40,.10)}
+  /* primary: open the app */
+  .cta{display:inline-block;font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:1.5px;
+    color:#F6F4EE;background:var(--pine);text-decoration:none;border-radius:14px;padding:19px 32px;
+    box-shadow:0 18px 44px rgba(34,48,40,.18);transition:.15s}
+  .cta:hover{background:var(--pine-soft);transform:translateY(-2px)}
+  .ctasub{font-family:var(--mono);font-size:12.5px;color:var(--dim);margin:12px 2px 26px;letter-spacing:.5px}
+
+  /* secondary: email, one box one button */
+  form{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:6px 6px 6px 16px;max-width:420px;box-shadow:0 10px 28px rgba(34,48,40,.07)}
   form:focus-within{box-shadow:0 0 0 3px var(--mist),0 18px 44px rgba(34,48,40,.10)}
   input[type=email]{flex:1;min-width:0;background:transparent;border:none;outline:none;
-    color:var(--ink);font-family:var(--mono);font-size:15px;padding:12px 0}
+    color:var(--ink);font-family:var(--mono);font-size:15px;padding:11px 0}
   input::placeholder{color:var(--dimmer)}
-  form button{flex:0 0 auto;border:none;border-radius:10px;padding:14px 20px;cursor:pointer;
+  form button{flex:0 0 auto;border:none;border-radius:10px;padding:13px 16px;cursor:pointer;
     font-family:var(--mono);font-weight:600;font-size:12.5px;letter-spacing:1.5px;
     background:var(--pine);color:#F6F4EE;transition:.15s}
   form button:hover{background:var(--pine-soft);transform:translateY(-2px);box-shadow:0 4px 14px rgba(30,58,47,.18)}
   .msg{font-family:var(--mono);font-size:12px;letter-spacing:.5px;margin:12px 2px 0;min-height:18px}
   .msg.err{color:var(--nogo)}
   .msg.ok{color:var(--go)}
-  .alt{font-family:var(--mono);font-size:12.5px;margin:14px 2px 0}
-  .alt a{font-weight:600}
+  .alt{font-family:var(--mono);font-size:13px;color:var(--dim);margin:0 2px 10px}
 
   /* ── below: what you get ── */
   main{max-width:640px;margin:0 auto;padding:64px 20px 90px}
-  .grp{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--dimmer);
+  .grp{font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--dimmer);
     text-transform:uppercase;margin:0 0 6px}
   .feat{display:flex;gap:18px;padding:20px 2px;border-bottom:1px solid var(--line)}
   .feat:last-of-type{border-bottom:none}
-  .feat .k{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--pine);
+  .feat .k{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--pine);
     flex:0 0 96px;letter-spacing:1px;padding-top:3px}
-  .feat p{margin:0;font-size:15px;color:var(--dim)}
+  .feat p{margin:0;font-size:17px;color:var(--dim)}
   .feat p b{color:var(--ink);font-weight:600}
 
   .try{display:block;text-align:center;font-family:var(--mono);font-weight:600;font-size:15px;
@@ -78,6 +93,10 @@
   .try:hover{background:var(--pine-soft)}
   .tiny{font-family:var(--mono);font-size:11px;color:var(--dimmer);text-align:center;margin:0}
   footer{font-family:var(--mono);font-size:11px;color:var(--dimmer);text-align:center;margin-top:56px}
+
+  .shot{display:none;position:absolute;z-index:2;right:clamp(24px,7vw,110px);bottom:56px;width:280px;height:auto;
+    border-radius:34px;border:10px solid #223028;box-shadow:0 40px 80px rgba(34,48,40,.35);transform:rotate(2.5deg)}
+  @media (min-width:1100px){.shot{display:block}}
 
   /* film grain: one fixed layer so the flat vectors read as printed */
   .grain{position:fixed;inset:0;z-index:9;pointer-events:none;opacity:.06;mix-blend-mode:multiply;
@@ -92,6 +111,18 @@
     .feat{flex-direction:column;gap:6px}
     .feat .k{flex-basis:auto}
     form button{padding:14px 14px}
+  }
+  @media (min-width:900px){
+    .hero{min-height:86svh}
+    main{max-width:980px;padding:56px 32px 72px;
+      display:grid;grid-template-columns:1fr 1fr;column-gap:56px}
+    .grp{grid-column:1/-1}
+    h2{grid-column:1;margin:6px 0 26px}
+    .try{grid-row:2;grid-column:2;justify-self:end;align-self:center;
+      margin:0;padding:16px 26px;font-size:15px}
+    .feat:nth-last-of-type(2){border-bottom:none}
+    .tiny{grid-column:1/-1;margin-top:30px}
+    footer{grid-column:1/-1;margin-top:40px}
   }
 </style>
 
@@ -153,17 +184,20 @@
     <rect x="0" y="700" width="1440" height="200" fill="url(#fogGrad)"/>
   </svg>
 
+  <img class="shot" src="shot.webp" width="640" height="1385" alt="The app: bike session, every line ticked, lamp says GO" loading="lazy">
   <div class="top"><span class="brand">HAPPY TUMTUM · FUELING CHECK</span></div>
   <div class="words">
-    <h1>The training is the <em>fun</em> part.<br>Fueling is the checklist.</h1>
-    <p class="lede">A free pre-session checklist for long training days. Pick the session, it does the gel and salt math, tick every line, <b>the lamp says GO</b>.</p>
+    <h1>Fueling is the hardest part.<br>So I made it a <em>checklist</em>.</h1>
+    <p class="lede">Built mid-Ironman-build, after one bonk too many. Pick your session, it does the gel and salt math, tick every line, <b>the lamp says GO</b>.</p>
+    <a class="cta" href="app/">OPEN THE CHECKLIST →</a>
+    <p class="ctasub">free · offline · no account · no app store</p>
+    <p class="alt">or leave an email, I'll ping you when it gets smarter:</p>
     <form id="form">
       <input type="email" id="email" placeholder="your@email.com" autocomplete="email" required aria-label="Email address">
       <input type="text" name="website" id="hp" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
-      <button type="submit" id="btn">SEND IT</button>
+      <button type="submit" id="btn">PING ME</button>
     </form>
     <div class="msg" id="msg" role="status"></div>
-    <p class="alt">or skip the list and <a href="app/">open the free app →</a></p>
   </div>
 </section>
 
@@ -172,8 +206,8 @@
 <main>
   <div class="grp">What you get</div>
   <h2>Run the checks. Then roll out.</h2>
-  <div class="feat"><div class="k">ADAPTS</div><p>Swim, bike, run or brick: <b>the list changes with the session</b>. No wetsuit line on a run day.</p></div>
-  <div class="feat"><div class="k">GEL MATH</div><p>Set the duration and it computes fuel: <b>2h ride → 6 gels · 150g carbs</b>. Counted, not guessed.</p></div>
+  <div class="feat"><div class="k">ADAPTS</div><p>Swim, bike, run or brick, <b>the list follows</b>. No wetsuit line on a run day.</p></div>
+  <div class="feat"><div class="k">GEL MATH</div><p>Set the duration: <b>2h ride → 6 gels · 150g carbs</b>. Counted, not guessed.</p></div>
   <div class="feat"><div class="k">GO / NO-GO</div><p>Everything ticked, the lamp goes green. Something missing? <b>You find out in the kitchen, not at kilometre 60</b>.</p></div>
   <div class="feat"><div class="k">FREE APP</div><p><b>Works offline, no app store, no account.</b> Open it on your phone, Share → Add to Home Screen, done.</p></div>
 
