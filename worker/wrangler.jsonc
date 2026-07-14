@@ -1,5 +1,5 @@
 {
-  "name": "preflight-signup",
+  "name": "tumtum-signup",
   "main": "src/index.js",
   "compatibility_date": "2026-07-14",
   "observability": { "enabled": true },
