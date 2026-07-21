@@ -2,7 +2,7 @@
 <!--
   HAPPY TUMTUM — stupid-simple pre-training GO/NO-GO checklist
   Pick session + duration → list adapts → tap to tick → GO.
-  First run asks your gel size + carbs/hr (saved locally). Swipe a line left to delete it.
+  First run asks carbs/hr + your week (saved locally). Fuel-agnostic: grams of carbs, not gels.
 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -37,7 +37,7 @@
     --sans:'Inter',system-ui,-apple-system,sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:#ECEAE1;color:var(--ink);font-family:var(--sans)}
+  html,body{margin:0;background:radial-gradient(1400px 900px at 50% -10%,#F0EEE5,#E4E2D7) fixed #E4E2D7;color:var(--ink);font-family:var(--sans)}
   body{display:flex;justify-content:center}
   #app{width:100%;max-width:468px;min-height:100vh;background:var(--panel);
     display:flex;flex-direction:column;position:relative;
@@ -56,29 +56,42 @@
     box-shadow:0 0 6px var(--nogo);transition:.25s}
   .status .lab{font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:1.5px;color:var(--nogo);transition:.25s}
   #app.go .status{border-color:var(--go);background:var(--go-bg)}
-  #app.go .status .dot{background:var(--go);box-shadow:0 0 8px var(--go)}
+  #app.go .status .dot{background:var(--go);box-shadow:0 0 8px var(--go);animation:glow 2.4s ease-in-out infinite}
+  @keyframes glow{50%{box-shadow:0 0 15px var(--go)}}
   #app.go .status .lab{color:var(--go)}
   .gear{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--raised);
-    font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;
+    box-shadow:0 1px 2px rgba(34,48,40,.05)}
+  .gear:hover{border-color:var(--pine-soft)}
+  .gear svg{width:19px;height:19px;stroke:var(--dim);fill:none;stroke-width:1.7;stroke-linecap:round}
 
   main{flex:1;overflow-y:auto;padding:16px 16px 120px}
 
   /* session + duration pickers */
   .picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
   .seg{padding:13px 4px;border-radius:14px;border:1px solid var(--line);background:var(--raised);
+    box-shadow:0 1px 2px rgba(34,48,40,.05);
     color:var(--dim);font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:1px;
     cursor:pointer;transition:.12s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
-  .seg .ic{font-size:18px;line-height:1}
+  .seg svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+  .seg.on svg{opacity:1}
   .seg:active{transform:scale(.96)}
   .seg.on{background:var(--pine);border-color:var(--pine);color:#F6F4EE;
     box-shadow:0 4px 14px rgba(30,58,47,.18)}
   .durrow{display:flex;align-items:center;gap:16px;background:var(--raised);border:1px solid var(--line);
-    border-radius:14px;padding:14px 16px;margin-bottom:16px}
+    border-radius:14px;padding:14px 16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(34,48,40,.05)}
   .durrow.hide{display:none}
   .dlab{min-width:92px}
   #durLab{font-family:var(--mono);font-weight:700;font-size:22px}
   .dsub{display:block;font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-top:2px}
-  input[type=range]{flex:1;accent-color:var(--pine);height:30px;margin:0}
+  input[type=range]{flex:1;-webkit-appearance:none;appearance:none;background:transparent;height:30px;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+    background:var(--pine);border:3.5px solid #fff;box-shadow:0 2px 8px rgba(34,48,40,.35);margin-top:-11px}
+  input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--line)}
+  input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--pine);
+    border:3.5px solid #fff;box-shadow:0 2px 8px rgba(34,48,40,.35)}
 
   /* group label */
   .grp{font-family:var(--mono);font-size:11.5px;letter-spacing:3px;color:var(--dimmer);
@@ -92,7 +105,7 @@
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:1px}
   .check{position:relative;z-index:1;display:flex;align-items:center;gap:14px;background:var(--raised);
-    border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;
+    border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;box-shadow:0 1px 2px rgba(34,48,40,.05);
     transition:transform .18s,background .12s,border-color .12s;user-select:none;touch-action:pan-y}
   .check:active{transform:scale(.995)}
   .check .box{width:30px;height:30px;border-radius:9px;border:2px solid var(--dimmer);flex:0 0 auto;
@@ -111,6 +124,7 @@
     padding:15px 16px;margin-top:16px}
   .pack .pl{font-family:var(--mono);font-size:14px;color:var(--ink);letter-spacing:.5px;line-height:1.5}
   .pack .pl b{color:var(--pine);letter-spacing:2px;font-size:11px;display:block;margin-bottom:3px}
+  .pack .pl small{display:block;font-size:11px;color:var(--dimmer);margin-top:3px;letter-spacing:0}
   .pack a{flex:0 0 auto;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:1px;
     color:#F6F4EE;background:var(--pine);text-decoration:none;border-radius:10px;padding:13px 14px}
 
@@ -179,26 +193,30 @@
     .sc{border-radius:20px;align-self:center;margin:auto}
     .setup{align-items:center}
   }
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  .grain{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.05;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .mono,#durLab,.dsub,#chVal{font-variant-numeric:tabular-nums}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
+<div class="grain" aria-hidden="true"></div>
 <div id="app">
   <header>
     <div class="htop">
       <h1>Happy Tumtum <span class="sr">· the fueling checklist</span></h1>
       <div class="hbtns">
         <div class="status" id="status"><span class="dot"></span><span class="lab" id="statLab">NO-GO</span></div>
-        <button class="gear" id="gear" title="Your fuel settings">⚙</button>
+        <button class="gear" id="gear" title="Your fuel settings" aria-label="Your fuel settings"><svg viewBox="0 0 24 24"><path d="M4 7h8M17.5 7H20M4 17h3M12.5 17H20"/><circle cx="14.5" cy="7" r="2.4"/><circle cx="9.5" cy="17" r="2.4"/></svg></button>
       </div>
     </div>
   </header>
 
   <main>
     <div class="picker" id="picker">
-      <div class="seg" data-sess="swim"><span class="ic">🏊</span>SWIM</div>
-      <div class="seg" data-sess="bike"><span class="ic">🚴</span>BIKE</div>
-      <div class="seg" data-sess="run"><span class="ic">🏃</span>RUN</div>
-      <div class="seg" data-sess="brick"><span class="ic">⚡</span>BRICK</div>
+      <div class="seg" data-sess="swim"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9c2-2.5 4-2.5 6 0s4 2.5 6 0 4-2.5 6 0M3 15c2-2.5 4-2.5 6 0s4 2.5 6 0 4-2.5 6 0"/></svg>SWIM</div>
+      <div class="seg" data-sess="bike"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="16" r="3.6"/><circle cx="18" cy="16" r="3.6"/><path d="M6 16l4-8h5M10 8l3 8M15 8l3 8M8.5 8h3"/></svg>BIKE</div>
+      <div class="seg" data-sess="run"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h5M11 13h5M17 7h3M7 13l4-6M14 19l4-6"/></svg>RUN</div>
+      <div class="seg" data-sess="brick"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="13.5" width="7.5" height="5.5" rx="1"/><rect x="13" y="13.5" width="7.5" height="5.5" rx="1"/><rect x="8.2" y="5.5" width="7.5" height="5.5" rx="1"/></svg>BRICK</div>
     </div>
 
     <div class="durrow" id="dur">
@@ -217,15 +235,7 @@
   <div class="setup hide" id="setup">
     <div class="sc">
       <h2>Your fuel</h2>
-      <p class="sub">Two answers, saved on your phone. The math follows you.</p>
-      <div class="q">Carbs per gel</div>
-      <div class="chips" id="gelChips">
-        <div class="chip" data-gel="20">20g</div>
-        <div class="chip" data-gel="25">25g</div>
-        <div class="chip" data-gel="30">30g</div>
-        <div class="chip" data-gel="40">40g</div>
-        <input class="chipin" id="gelCustom" type="number" min="10" max="120" placeholder="…g" aria-label="Custom carbs per gel">
-      </div>
+      <p class="sub">One answer, saved on your phone. Gels, chews, or a bottle of syrup, the math is just carbs.</p>
       <div class="q">Carbs per hour</div>
       <div class="chrow">
         <span id="chVal">75 g/h</span>
@@ -249,9 +259,11 @@
 (function(){
   "use strict";
   const $=s=>document.querySelector(s);
-  const DEF={gelG:25,carbHr:75};
+  const DEF={carbHr:75};
   const P=()=>S.prefs||DEF;
-  const gels=h=>Math.max(1,Math.ceil((P().carbHr*h)/P().gelG));
+  const carbs=h=>Math.round(P().carbHr*h);
+  // ponytail: 25g/gel and ~0.9g carbs per ml maple syrup, display-only equivalences
+  const equiv=c=>"≈ "+Math.ceil(c/25)+" gels or "+Math.round(c/0.9)+"ml maple syrup";
 
   // ponytail: placeholder store link + utm; swap for The Feed CJ deep link once approved
   const AFF="https://thefeed.com/?utm_source=happytumtum&utm_medium=app&utm_campaign=pack";
@@ -262,7 +274,7 @@
     try{fetch(API+"/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({ev,cid})}).catch(()=>{});}catch(e){}};
 
   // ── per-session checklists ──
-  const gelLine=()=>({id:"gels",label:"Gels packed",grp:"fuel",hint:d=>"×"+gels(d)});
+  const fuelLine=()=>({id:"fuel",label:"Fuel packed",grp:"fuel",hint:d=>carbs(d)+"g carbs"});
   const TPL={
     swim:{fuel:[
         {id:"ate",label:"Ate ~1 hr before"},
@@ -276,8 +288,8 @@
       ]},
     bike:{fuel:[
         {id:"bottles",label:"Bottles filled",hint:"fluid + salt"},
-        gelLine(),
-        {id:"pre",label:"Pre-ride gel eaten"},
+        fuelLine(),
+        {id:"pre",label:"Ate before rolling"},
       ],gear:[
         {id:"fix",label:"Tube ×2 + inflation + multitool"},
         {id:"helmet",label:"Helmet · shoes · glasses"},
@@ -287,7 +299,7 @@
         {id:"route",label:"Route + refill stops"},
       ]},
     run:{fuel:[
-        gelLine(),
+        fuelLine(),
         {id:"bottle",label:"Handheld / bottle"},
         {id:"pre",label:"Ate before"},
       ],gear:[
@@ -300,8 +312,8 @@
       ]},
     brick:{fuel:[
         {id:"bottles",label:"Bottles filled",hint:"fluid + salt"},
-        gelLine(),
-        {id:"pre",label:"Pre-ride gel eaten"},
+        fuelLine(),
+        {id:"pre",label:"Ate before rolling"},
       ],gear:[
         {id:"fix",label:"Tube + inflation + multitool"},
         {id:"helmet",label:"Helmet · bike shoes · glasses"},
@@ -339,7 +351,7 @@
     $("#dur").classList.toggle("hide",!NEEDS_DUR(S.sess));
     $("#durSlide").value=S.dur;
     $("#durLab").textContent=(S.dur+"").replace(".5","½")+"h";
-    $("#durSub").textContent="×"+gels(S.dur)+" gels"+(fromPlan?" · today's plan":"");
+    $("#durSub").textContent=carbs(S.dur)+"g carbs"+(fromPlan?" · today's plan":"");
     const its=items(),c=S.checks[S.sess]||{};
     let html="",lastG=null;
     its.forEach(it=>{
@@ -353,7 +365,7 @@
     if(lastG)html+=`</div>`;
     if(NEEDS_DUR(S.sess)){
       const btl=S.sess==="run"?"1 bottle":"2 bottles";
-      html+=`<div class="pack"><div class="pl"><b>PACK</b>${gels(S.dur)} gels · ${btl} · salt tabs</div>
+      html+=`<div class="pack"><div class="pl"><b>PACK</b>${carbs(S.dur)}g carbs · ${btl} · salt tabs<small>${equiv(carbs(S.dur))}</small></div>
         <a href="${AFF}" target="_blank" rel="noopener" id="buyPack">BUY THE LIST →</a></div>`;
       track("pack_view");
     }
@@ -369,8 +381,6 @@
   const suggest=w=>Math.min(95,Math.max(50,Math.round(w))); // ponytail: ~1g/kg/h clamped; the real ceiling is gut training
   const DAYS=[["mon","MON"],["tue","TUE"],["wed","WED"],["thu","THU"],["fri","FRI"],["sat","SAT"],["sun","SUN"]];
   function paintSetup(){
-    document.querySelectorAll("[data-gel]").forEach(c=>c.classList.toggle("on",+c.dataset.gel===T.gelG));
-    $("#gelCustom").value=[20,25,30,40].includes(T.gelG)?"":T.gelG;
     $("#chSlide").value=T.carbHr;
     $("#chVal").textContent=T.carbHr+" g/h";
     $("#restore").classList.toggle("hide",!Object.values(S.removed).some(a=>a.length));
@@ -401,19 +411,16 @@
     if(w>=30&&w<=150){b.textContent="use "+suggest(w)+"g/h";b.classList.remove("hide");}
     else b.classList.add("hide");
   });
-  $("#gelCustom").addEventListener("input",e=>{const v=+e.target.value;if(v>=10)T.gelG=v;paintSetup();$("#gelCustom").value=e.target.value;});
 
   document.body.addEventListener("click",e=>{
     const del=e.target.closest("[data-del]");
     if(del){(S.removed[S.sess]=S.removed[S.sess]||[]).push(del.dataset.del);render();save();return;}
     if(e.target.closest("#buyPack")){sent.pack_tap=0;track("pack_tap");return;}
     if(e.target.closest("#gear")){openSetup();return;}
-    const gc=e.target.closest("[data-gel]");
-    if(gc){T.gelG=+gc.dataset.gel;paintSetup();return;}
     if(e.target.closest("#useCalc")){const w=+$("#wkg").value;T.carbHr=suggest(w);T.wKg=w;paintSetup();return;}
     if(e.target.closest("#restore")){S.removed={};paintSetup();render();save();return;}
     if(e.target.closest("#saveSetup")){
-      S.prefs={gelG:T.gelG||DEF.gelG,carbHr:T.carbHr||DEF.carbHr,wKg:T.wKg||null};
+      S.prefs={carbHr:T.carbHr||DEF.carbHr,wKg:T.wKg||null};
       S.plan=null;
       DAYS.forEach(([d])=>{
         const s=$(`[data-ps="${d}"]`).value;
